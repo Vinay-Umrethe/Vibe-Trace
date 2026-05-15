@@ -333,13 +333,21 @@ def main() -> None:
     raise SystemExit(2)
 
 
-@mcp.resource("vt://readme")
+@mcp.resource(
+    "vt://readme",
+    name="View Vibe Trace README",
+    description="Usage guide for Vibe Trace and its MCP tools.",
+)
 async def vt_readme() -> str:
     readme_text = package_readme()
     return readme_text
 
 
-@mcp.resource("vt://convention")
+@mcp.resource(
+    "vt://convention",
+    name="View Vibe Trace Naming Convention",
+    description="Session archive path and filename convention used by Vibe Trace.",
+)
 async def vt_convention() -> str:
     return """sessions/YYYY-MM-DD/PROJECT-FULL-NAME/S0000--PLATFORM--PROVIDER.MODEL--EFFORT.jsonl
 SESSION is zero-based in the filename. A human session number of 1 maps to S0000.
@@ -347,7 +355,11 @@ EFFORT is stored as a hyphen sequence in filenames and as reasoning_effort list 
 The structural filename delimiter is --."""
 
 
-@mcp.resource("vt://sessions/index")
+@mcp.resource(
+    "vt://sessions/index",
+    name="View Vibe Trace Sessions Index",
+    description="Current JSONL index of archived Vibe Trace sessions.",
+)
 async def vt_sessions_index() -> str:
     records = load_session_records(get_config())
     return json.dumps(records, indent=2, ensure_ascii=False)
