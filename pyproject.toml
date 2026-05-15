@@ -1,6 +1,6 @@
 [project]
 name = "vibe-trace"
-version = "1.0.0"
+version = "1.0.1"
 description = "Agent sessions archive and MCP server for vibe-coding agent traces."
 readme = "README_EN.md"
 requires-python = ">=3.12"
