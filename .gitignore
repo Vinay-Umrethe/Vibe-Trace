@@ -1,0 +1,31 @@
+# Environment.
+venv/
+.venv/
+env/
+.staging/
+__pycache__/
+.ruff_cache__/
+*.py[cod]
+
+# Data.
+data/
+index/
+sessions/
+skills/
+cache/
+*.jsonl
+*.csv
+*.parquet
+
+# Logs.
+logs/
+runs/
+*.log
+
+# Others.
+.env
+.secrets
+.vscode/
+dist/
+build/
+.ipynb_checkpoints
