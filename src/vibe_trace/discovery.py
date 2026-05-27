@@ -32,7 +32,9 @@ def supported_platforms_text() -> str:
 def default_platform_roots(platform: str) -> list[Path]:
     normalized = normalize_platform(platform)
     if normalized not in SUPPORTED_PLATFORMS:
-        raise ValueError(f"Automatic trace discovery supports: {supported_platforms_text()}.")
+        raise ValueError(
+            f"Automatic trace discovery supports: {supported_platforms_text()}."
+        )
 
     home = Path.home()
     candidates: dict[str, list[Path]] = {
@@ -47,7 +49,9 @@ def default_platform_roots(platform: str) -> list[Path]:
 def candidate_trace_files(root: Path, platform: str) -> list[Path]:
     normalized = normalize_platform(platform)
     if normalized not in SUPPORTED_PLATFORMS:
-        raise ValueError(f"Automatic trace discovery supports: {supported_platforms_text()}.")
+        raise ValueError(
+            f"Automatic trace discovery supports: {supported_platforms_text()}."
+        )
 
     files = []
     for pattern in PLATFORM_GLOBS[normalized]:
@@ -63,7 +67,9 @@ def find_recent_traces(
 
     normalized_platform = normalize_platform(platform)
     if normalized_platform not in SUPPORTED_PLATFORMS:
-        raise ValueError(f"Automatic trace discovery supports: {supported_platforms_text()}.")
+        raise ValueError(
+            f"Automatic trace discovery supports: {supported_platforms_text()}."
+        )
 
     roots = (
         [Path(path).expanduser() for path in search_roots]
@@ -78,7 +84,9 @@ def find_recent_traces(
     for root in existing_roots:
         files.extend(candidate_trace_files(root, normalized_platform))
 
-    unique_files = sorted(set(files), key=lambda path: path.stat().st_mtime, reverse=True)
+    unique_files = sorted(
+        set(files), key=lambda path: path.stat().st_mtime, reverse=True
+    )
     results = []
     for path in unique_files[:limit]:
         stat = path.stat()

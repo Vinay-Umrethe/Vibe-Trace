@@ -85,7 +85,9 @@ def upsert_session_record(
 ) -> dict[str, Any]:
     if not locked:
         with session_index_lock(config):
-            return upsert_session_record(config, archive_path, record, update, locked=True)
+            return upsert_session_record(
+                config, archive_path, record, update, locked=True
+            )
 
     index_path = sessions_index_path(config)
     target = str(archive_path.resolve())
@@ -110,6 +112,8 @@ def find_latest_record_for_target(
 ) -> dict[str, Any] | None:
     target = str(target_path.resolve())
     matches = [
-        record for record in load_session_records(config) if record.get("archive_path") == target
+        record
+        for record in load_session_records(config)
+        if record.get("archive_path") == target
     ]
     return latest_snapshot(matches[-1]) if matches else None

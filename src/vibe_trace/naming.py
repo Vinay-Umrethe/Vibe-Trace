@@ -21,7 +21,11 @@ def normalize_path(raw_path: str | PathLike[str]) -> Path:
         return Path(raw_path).expanduser()
 
     path_text = raw_path.strip()
-    if len(path_text) >= 2 and path_text[0] == path_text[-1] and path_text[0] in {"'", '"'}:
+    if (
+        len(path_text) >= 2
+        and path_text[0] == path_text[-1]
+        and path_text[0] in {"'", '"'}
+    ):
         path_text = path_text[1:-1]
     return Path(path_text).expanduser()
 
@@ -40,7 +44,9 @@ def normalize_text(raw_value: str, label: str) -> str:
     if "--" in value:
         raise ValueError(f"{label} cannot contain --.")
     if any(char in value for char in '<>:"/\\|?*'):
-        raise ValueError(f"{label} contains a character that is invalid in Windows filenames.")
+        raise ValueError(
+            f"{label} contains a character that is invalid in Windows filenames."
+        )
     return value
 
 
@@ -81,9 +87,7 @@ def build_session_filename(
 ) -> str:
     if extension.lower() not in VALID_EXTENSIONS:
         raise ValueError("Session files must use .json or .jsonl.")
-    return (
-        f"{session_id}--{platform}--{provider}.{model}--{effort_token(effort)}{extension.lower()}"
-    )
+    return f"{session_id}--{platform}--{provider}.{model}--{effort_token(effort)}{extension.lower()}"
 
 
 def parse_session_filename(path: Path) -> dict[str, object]:

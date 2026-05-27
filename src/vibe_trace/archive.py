@@ -143,14 +143,18 @@ def archive_trace(
         return record
 
 
-def validate_archive(path: str, config: KnowledgeBaseConfig | None = None) -> dict[str, Any]:
+def validate_archive(
+    path: str, config: KnowledgeBaseConfig | None = None
+) -> dict[str, Any]:
     config = config or get_config()
     target = normalize_path(path).resolve()
     ensure_trace_file(target)
     parsed = parse_session_filename(target)
     target_hash = sha256_file(target)
     latest_record = find_latest_record_for_target(config, target)
-    hash_matches_index = latest_record is not None and latest_record.get("sha256") == target_hash
+    hash_matches_index = (
+        latest_record is not None and latest_record.get("sha256") == target_hash
+    )
     return {
         "status": "valid" if hash_matches_index else "valid_unindexed",
         "archive_path": str(target),

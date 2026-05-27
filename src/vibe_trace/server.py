@@ -29,6 +29,55 @@ BANNER = """██╗   ██╗██╗██████╗ █████�
  ╚████╔╝ ██║██████╔╝███████╗       ██║   ██║  ██║██║  ██║╚██████╗███████╗
   ╚═══╝  ╚═╝╚═════╝ ╚══════╝       ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚══════╝"""
 AUTHOR = "Vinay Umrethe <umrethevinay@gmail.com>"
+VIBE_TRACE_SKILL_MD = """---
+name: vibe-trace
+description: Use Vibe Trace to discover, archive, validate, list, and inspect local coding-agent session traces.
+---
+
+# Vibe Trace
+
+Use this MCP when you need to preserve or understand local coding-agent session traces.
+
+## Purpose
+
+Vibe Trace archives raw agent traces into a stable local structure and indexes them so future
+agents or the user can find sessions by project, date, platform, provider, model, and reasoning effort.
+
+## When To Use
+
+- Use it after a meaningful coding session that should be preserved.
+- Use it when a user asks to find recent Codex, Claude Code, Cursor, or PI-Agent traces.
+- Use it when validating whether an archived trace still matches its index hash.
+
+## Archive Workflow
+
+1. Call `vt_find_recent_traces` for the platform unless the user already gave `source_path`.
+2. Ask for missing archive metadata: `session_date`, `project`, `session_number`,
+   `platform`, `provider`, `model`, and `reasoning_effort`. (if you are not aware of metadata, ask the user)
+3. Call `vt_archive_trace` with the selected source file and metadata.
+4. Call `vt_validate_archive` on the returned `archive_path`.
+5. Report the archive path, validation status, SHA-256, and whether this was a new archive
+   or an update to an existing resumed session.
+
+## Listing Workflow
+
+Use `vt_list_sessions` when the user wants archived history. Apply only the filters the user
+gave. Use pagination when more results are available.
+
+## Inspection Workflow
+
+Use `vt_inspect_file` for `.json`, `.jsonl`, `.parquet`, or folders containing those files.
+Set `include_example` only when examples help the user understand the data.
+
+## Rules
+
+- Never delete, move, or rewrite the original source trace.
+- Do not guess uncertain metadata. Ask the user for missing date, project, model, or effort.
+- `session_number` is one-based: `1` becomes `S0000`.
+- `reasoning_effort` must be chronological and use only `LOW`, `MEDIUM`, `HIGH`, or `XHIGH`.
+- For resumed sessions, keep the original session date and archive to the same target path.
+- Prefer `vt_validate_archive` after every archive operation.
+"""
 
 
 @mcp.tool(
@@ -55,7 +104,9 @@ async def vt_find_recent_traces(
     Returns:
         Candidate trace paths and file metadata.
     """
-    traces = find_recent_traces(platform=platform, limit=limit, search_roots=search_roots)
+    traces = find_recent_traces(
+        platform=platform, limit=limit, search_roots=search_roots
+    )
     return {
         "status": "ok",
         "platform": normalize_text(platform, "platform"),
@@ -181,9 +232,15 @@ async def vt_list_sessions(
 
     filtered = []
     for record in records:
-        if any(value is not None and record.get(key) != value for key, value in filters.items()):
+        if any(
+            value is not None and record.get(key) != value
+            for key, value in filters.items()
+        ):
             continue
-        if effort_filter is not None and record.get("reasoning_effort") != effort_filter:
+        if (
+            effort_filter is not None
+            and record.get("reasoning_effort") != effort_filter
+        ):
             continue
         filtered.append(record)
 
@@ -308,6 +365,10 @@ def show_status() -> None:
         "Tools",
         "vt_find_recent_traces, vt_archive_trace, vt_validate_archive, vt_list_sessions, vt_inspect_file",
     )
+    table.add_row(
+        "Resources",
+        "vt://skill.md, vt://readme, vt://convention, vt://sessions/index",
+    )
     console.print(table)
 
 
@@ -331,6 +392,15 @@ def main() -> None:
     console.print(f"[red]Unknown argument:[/] {' '.join(args)}")
     console.print("Use [bold]vibe-trace --help[/bold].")
     raise SystemExit(2)
+
+
+@mcp.resource(
+    "vt://skill.md",
+    name="View Vibe Trace Agent Skill",
+    description="Short Markdown guide that tells agents when and how to use Vibe Trace.",
+)
+async def vt_skill() -> str:
+    return VIBE_TRACE_SKILL_MD
 
 
 @mcp.resource(

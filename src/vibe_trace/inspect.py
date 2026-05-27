@@ -95,9 +95,13 @@ def merge_schemas_and_examples(
         merged_example = {}
         for key in set(schema_a) | set(schema_b):
             child_schema_a = schema_a.get(key)
-            child_example_a = example_a.get(key) if isinstance(example_a, dict) else None
+            child_example_a = (
+                example_a.get(key) if isinstance(example_a, dict) else None
+            )
             child_schema_b = schema_b.get(key)
-            child_example_b = example_b.get(key) if isinstance(example_b, dict) else None
+            child_example_b = (
+                example_b.get(key) if isinstance(example_b, dict) else None
+            )
             merged_schema[key], merged_example[key] = merge_schemas_and_examples(
                 child_schema_a,
                 child_example_a,
@@ -112,8 +116,12 @@ def merge_schemas_and_examples(
         if not schema_b:
             return schema_a, example_a
 
-        example_value_a = example_a[0] if isinstance(example_a, list) and example_a else None
-        example_value_b = example_b[0] if isinstance(example_b, list) and example_b else None
+        example_value_a = (
+            example_a[0] if isinstance(example_a, list) and example_a else None
+        )
+        example_value_b = (
+            example_b[0] if isinstance(example_b, list) and example_b else None
+        )
         merged_schema, merged_example = merge_schemas_and_examples(
             schema_a[0],
             example_value_a,
@@ -130,9 +138,15 @@ def merge_schemas_and_examples(
             else example_b,
         )
 
-    union_types = set(schema_a.split(" | ") if isinstance(schema_a, str) else [str(schema_a)])
-    union_types.update(schema_b.split(" | ") if isinstance(schema_b, str) else [str(schema_b)])
-    example = example_a if example_a is not None and str(example_a).strip() else example_b
+    union_types = set(
+        schema_a.split(" | ") if isinstance(schema_a, str) else [str(schema_a)]
+    )
+    union_types.update(
+        schema_b.split(" | ") if isinstance(schema_b, str) else [str(schema_b)]
+    )
+    example = (
+        example_a if example_a is not None and str(example_a).strip() else example_b
+    )
     return " | ".join(sorted(union_types)), example
 
 
@@ -236,7 +250,9 @@ def inspect_target(
 
     files = collect_files(path, recursive=recursive)
     if not files:
-        raise ValueError("Path must be a supported file or folder containing supported files.")
+        raise ValueError(
+            "Path must be a supported file or folder containing supported files."
+        )
 
     selected_files = files[:max_files]
     unique_schemas: dict[str, tuple[Any, Any, int]] = {}
@@ -244,7 +260,9 @@ def inspect_target(
     records_seen = 0
     for file_path in selected_files:
         try:
-            schema, example, file_records_seen = process_file(file_path, max_records_per_file)
+            schema, example, file_records_seen = process_file(
+                file_path, max_records_per_file
+            )
             records_seen += file_records_seen
         except Exception as exc:
             errors.append({"path": str(file_path), "error": str(exc)})
